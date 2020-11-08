@@ -1,2 +1,2 @@
 # Prediction_market
-Prediction market project for blockchain class
+Prediction market project for blockchain class.
