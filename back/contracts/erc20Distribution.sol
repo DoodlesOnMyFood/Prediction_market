@@ -25,28 +25,26 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         _;
     }
 
-    //request 저장. 요구는 한 주소당 1개 시장당 1개만. 다시 제안하려면 기존요구 취소하고 다시 제안.
-    function request(uint8 _market_id, uint8 _tokenKind, uint256 _price) external marketCheck(_market_id) returns (uint256){
-        require(alreadyRequest[msg.sender][_market_id] == false, "already request");   //기존 요구가 있는지 확인.
+    //요구하기 // 한시장당 1번.
+    function request(uint8 _market_id, uint8 _tokenKind, uint256 _price) external marketCheck(_market_id) returns (bool){
         uint256 id;
-        requests[_market_id].push(Request(_market_id, _tokenKind, _price, msg.sender, true));
-        id = requests[_market_id].length - 1;
-        requestIdOf[msg.sender][_market_id] = id;
-        alreadyRequest[msg.sender][_market_id] == true;
-        return id;
-    }
-
-    //요구했던거 바꾸기
-    function requestChange(uint8 _market_id, uint8 _tokenKind, uint256 _price) external marketCheck(_market_id) returns (bool){
-        require(alreadyRequest[msg.sender][_market_id] == true, "you have no data to change");   //기존 제안이 있는지 확인.
-        uint256 id = requestIdOf[msg.sender][_market_id];
-        requests[_market_id][id].is_valid = false;
-        requests[_market_id][id].market_id = _market_id;
-        requests[_market_id][id].tokenKind = _tokenKind;
-        requests[_market_id][id].requestPrice = _price;
-        requests[_market_id][id].requester = msg.sender;
-        requests[_market_id][id].is_valid = true;
-        return true;
+        if (alreadyRequest[msg.sender][_market_id] == false){
+            requests[_market_id].push(Request(_market_id, _tokenKind, _price, msg.sender, true));
+            id = requests[_market_id].length - 1;
+            requestIdOf[msg.sender][_market_id] = id;
+            alreadyRequest[msg.sender][_market_id] == true;
+            return true;
+        }
+        else {   
+            id = requestIdOf[msg.sender][_market_id];
+            requests[_market_id][id].is_valid = false;
+            requests[_market_id][id].market_id = _market_id;
+            requests[_market_id][id].tokenKind = _tokenKind;
+            requests[_market_id][id].requestPrice = _price;
+            requests[_market_id][id].requester = msg.sender;
+            requests[_market_id][id].is_valid = true;
+            return true;
+        }
     }
 
     //요청 보여주기. 
