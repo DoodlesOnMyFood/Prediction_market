@@ -1,8 +1,8 @@
 pragma solidity 0.7.0;
 
-import "./customToken.sol";
+import "./erc20Capped.sol";
 
-contract YesCoin is CustomToken{
+contract YesCoin is ERC20, ERC20Capped{
     uint8 private constant TOKENKIND = 0;
     string private constant NAME = "YesCoin";
     string private constant SYMBOL = "Yes";
@@ -10,7 +10,7 @@ contract YesCoin is CustomToken{
     uint256 private constant MAX_SUPPLY = MAX_TOKEN_COUNT;   // 토큰은 1시장당 yes coin 1천개, no coin 1천개가 발행된다.             
 
     //yescoin 설정
-    constructor() CustomToken(NAME, SYMBOL, MAX_SUPPLY) {  
+    constructor() ERC20Capped(MAX_SUPPLY) ERC20(NAME, SYMBOL) {  
     }
         
     //yescoin minting. 
