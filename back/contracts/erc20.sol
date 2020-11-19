@@ -40,10 +40,11 @@ contract ERC20 is Context {
     mapping (uint8 => bool) internal is_over_distribute;  // market_id 당 distribute끝났는지 기록.
     mapping (uint8 => uint256) internal _totalSupply;
     mapping (uint8 => uint256) internal _expirationDateOf;
+    mapping (uint8 => string) internal _questionsOf;
     string private _name;
     string private _symbol;
     uint8 private _decimals;
-    uint8[] private _market_ids;
+    uint8[] internal _market_ids;
 
      /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
@@ -73,45 +74,48 @@ contract ERC20 is Context {
         _symbol = symbol;
         _decimals = 18;
     }
-    function endMarket(uint8 _market_id) external onlyOwner returns (bool){
+    
+      //market_ids 안에 이미 존재하는지 체크;
+    function _already_market_id(uint8 _market_id) internal view returns (bool) {
+        for (uint i = 0; i < _market_ids.length; i++) {
+            if (_market_ids[i] == _market_id) {
+                return true;
+            }
+        }
     }
-
-    function setExpiration(uint8 _market_id, uint256 _expiration_date)public onlyOwner returns (bool){
-        _expirationDateOf[_market_id] = _expiration_date;
-        return true;
-    }
+    
 
     /**
      * @dev Returns the name of the token.
      */
-    function name() public view returns (string memory) {
-        return _name;
-    }
+    // function name() public view returns (string memory) {
+    //     return _name;
+    // }
 
-    /**
-     * @dev Returns the symbol of the token, usually a shorter version of the
-     * name.
-     */
-    function symbol() public view returns (string memory) {
-        return _symbol;
-    }
+    // /**
+    //  * @dev Returns the symbol of the token, usually a shorter version of the
+    //  * name.
+    //  */
+    // function symbol() public view returns (string memory) {
+    //     return _symbol;
+    // }
 
-    /**
-     * @dev Returns the number of decimals used to get its user representation.
-     * For example, if `decimals` equals `2`, a balance of `505` tokens should
-     * be displayed to a user as `5,05` (`505 / 10 ** 2`).
-     *
-     * Tokens usually opt for a value of 18, imitating the relationship between
-     * Ether and Wei. This is the value {ERC20} uses, unless {_setupDecimals} is
-     * called.
-     *
-     * NOTE: This information is only used for _display_ purposes: it in
-     * no way affects any of the arithmetic of the contract, including
-     * {IERC20-balanceOf} and {IERC20-transfer}.
-     */
-    function decimals() public view returns (uint8) {
-        return _decimals;
-    }
+    // /**
+    //  * @dev Returns the number of decimals used to get its user representation.
+    //  * For example, if `decimals` equals `2`, a balance of `505` tokens should
+    //  * be displayed to a user as `5,05` (`505 / 10 ** 2`).
+    //  *
+    //  * Tokens usually opt for a value of 18, imitating the relationship between
+    //  * Ether and Wei. This is the value {ERC20} uses, unless {_setupDecimals} is
+    //  * called.
+    //  *
+    //  * NOTE: This information is only used for _display_ purposes: it in
+    //  * no way affects any of the arithmetic of the contract, including
+    //  * {IERC20-balanceOf} and {IERC20-transfer}.
+    //  */
+    // function decimals() public view returns (uint8) {
+    //     return _decimals;
+    // }
 
     /**
      * @dev See {IERC20-totalSupply}.
@@ -132,6 +136,11 @@ contract ERC20 is Context {
         for (uint256 i = 0; i < _market_ids.length; i++){
             result[i] = _market_ids[i];
         }
+        return result;
+    }
+    
+    function questionOf(uint8 _market_id) public view returns (string memory){
+        string memory result = _questionsOf[_market_id];
         return result;
     }
 
@@ -339,21 +348,5 @@ contract ERC20 is Context {
     //  */
     // // function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual { }
 
-     //market_ids 안에 이미 존재하는지 체크;
-    function _already_market_id(uint8 _market_id) internal view returns (bool) {
-        for (uint i = 0; i < _market_ids.length; i++) {
-            if (_market_ids[i] == _market_id) {
-                return true;
-            }
-        }
-    }
-
-    function set_market_id(uint8 _market_id) external onlyOwner returns (bool) {
-        if (_already_market_id(_market_id) == true){
-            is_over_distribute[_market_id] = true;
-        }
-        else {
-            _market_ids.push(_market_id);
-        }
-    }
+   
 }
