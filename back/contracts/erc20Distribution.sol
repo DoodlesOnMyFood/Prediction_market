@@ -103,16 +103,5 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         delete requestIdOf[requester][_market_id];
     }
 
-     //쓸 수 있는 marketid 출력
-    function usableMarketId() external view returns (uint8[] memory){
-        uint8[] memory result;
-        uint8 counter;
-        for (uint8 i = 0; i < 256 ; i++) {
-            if (is_over_distribute[i] == false) {
-                result[counter] = i;
-                counter++;
-            }
-        }
-        return result;
-    }
+    
 }
