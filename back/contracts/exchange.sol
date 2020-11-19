@@ -36,8 +36,4 @@ contract Exchange is TokenTrade {
         _burn1(msg.sender, _market_id, balanceOf1(msg.sender, _market_id));
     }
 
-    function setWinner(uint8 _market_id, uint8 _tokenKind) external onlyOwner returns (bool){
-        _winnerTokenOf[_market_id] = _tokenKind;
-        return true;
-    }
 }
