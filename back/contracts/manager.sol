@@ -5,9 +5,9 @@ import "./exchange.sol";
 contract Manager is Exchange{
      //쓸 수 있는 marketid 출력
     function usableMarketId() external view onlyOwner returns (uint8[] memory){
-        uint8[] memory result;
+        uint8[] memory result = new uint8[](_market_ids.length);
         uint8 counter;
-        for (uint8 i = 0; i < 256 ; i++) {
+        for (uint8 i = 0; i < _market_ids.length ; i++) {
             if (is_over_distribute[i] == false) {
                 result[counter] = i;
                 counter++;
