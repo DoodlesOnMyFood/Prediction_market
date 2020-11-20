@@ -3,7 +3,7 @@ pragma solidity 0.7.0;
 import "./erc20Capped.sol";
 
 contract YesCoin is ERC20, ERC20Capped{
-    uint8 private constant TOKENKIND = 0;
+    uint8 private constant TOKENKIND = 1;
     string private constant NAME = "YesCoin";
     string private constant SYMBOL = "Yes";
     uint256 private constant MAX_TOKEN_COUNT = 1000;    //1천개
