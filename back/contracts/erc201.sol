@@ -132,17 +132,17 @@ contract ERC201 is Context {
         return _balances1[account][_market_id];
     }
 
-    function market_ids1() public view returns (uint8[] memory){
-        uint8[] memory result = new uint8[](_market_ids1.length);
-        for (uint256 i = 0; i < _market_ids1.length; i++){
-            result[i] = _market_ids1[i];
-        }
-        return result;
-    }
+    // function market_ids1() public view returns (uint8[] memory){
+    //     uint8[] memory result = new uint8[](_market_ids1.length);
+    //     for (uint256 i = 0; i < _market_ids1.length; i++){
+    //         result[i] = _market_ids1[i];
+    //     }
+    //     return result;
+    // }
     
-    function expirationDateOf1(uint8 _market_id) public view returns (uint256){
-        return _expirationDateOf1[_market_id];
-    }
+    // function expirationDateOf1(uint8 _market_id) public view returns (uint256){
+    //     return _expirationDateOf1[_market_id];
+    // }
 
     /**
      * @dev See {IERC20-transfer}.
@@ -152,10 +152,10 @@ contract ERC201 is Context {
      * - `recipient` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer1(address recipient, uint8 _market_id, uint256 amount) public returns (bool) {
-        _transfer1(_msgSender(), recipient, _market_id, amount);
-        return true;
-    }
+    // function transfer1(address recipient, uint8 _market_id, uint256 amount) public returns (bool) {
+    //     _transfer1(_msgSender(), recipient, _market_id, amount);
+    //     return true;
+    // }
 
     // /**
     //  * @dev See {IERC20-allowance}.
