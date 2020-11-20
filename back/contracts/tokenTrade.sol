@@ -14,8 +14,8 @@ contract TokenTrade is ERC20Distribution {
         uint256 suggestPrice;         //1c당 ether가격
         bool is_valid;
     }
-    mapping (uint8 => mapping (uint8 => uint8)) count; //for market id, token kind, trade count 
-    mapping (uint8 => mapping (uint8 => uint256)) recentTrade; 
+    mapping (uint8 => mapping (uint8 => uint8)) private count; //for market id, token kind, trade count 
+    mapping (uint8 => mapping (uint8 => uint256)) private recentTrade; 
     mapping (uint8 => uint256[]) private yesCoinP;
     mapping (uint8 => uint256[]) private noCoinP;
 
