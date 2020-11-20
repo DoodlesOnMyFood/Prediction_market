@@ -3,7 +3,7 @@ pragma solidity 0.7.0;
 import "./erc20Capped1.sol";
 
 contract NoCoin is ERC201, ERC20Capped1{
-    uint8 private constant TOKENKIND1 = 0;
+    uint8 private constant TOKENKIND1 = 2;
     string private constant NAME1 = "NoCoin";
     string private constant SYMBOL1 = "No";
     uint256 private constant MAX_TOKEN_COUNT1 = 1000;    //1천개
