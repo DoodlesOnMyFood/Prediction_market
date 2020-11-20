@@ -7,9 +7,9 @@ contract Manager is Exchange{
     function usableMarketId() external view onlyOwner returns (uint8[] memory){
         uint8[] memory result = new uint8[](_market_ids.length);
         uint8 counter;
-        for (uint8 i = 0; i < _market_ids.length ; i++) {
-            if (is_over_distribute[i] == false) {
-                result[counter] = i;
+        for (uint16 i = 0; i < _market_ids.length ; i++) {
+            if (is_over_distribute[uint8(i)] == false) {
+                result[counter] = uint8(i);
                 counter++;
             }
         }
