@@ -82,6 +82,7 @@ contract ERC20 is Context {
                 return true;
             }
         }
+        return false;
     }
     
 
@@ -132,7 +133,7 @@ contract ERC20 is Context {
     }
 
     function market_ids() public view returns (uint8[] memory){
-        uint8[] memory result;
+        uint8[] memory result = new uint8[](_market_ids.length);
         for (uint256 i = 0; i < _market_ids.length; i++){
             result[i] = _market_ids[i];
         }
