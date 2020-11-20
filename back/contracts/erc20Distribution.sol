@@ -52,11 +52,11 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         uint256[] memory result = new uint256[](requests[_market_id].length);
         uint idx;
         uint8 searchKind;
-        if (_tokenKind == 0) {
-            searchKind = 1;
+        if (_tokenKind == 1) {
+            searchKind = 2;
         }
-        else if (_tokenKind == 1){
-            searchKind = 0;
+        else if (_tokenKind == 2){
+            searchKind = 1;
         }
         for (uint i = 0; i < requests[_market_id].length; i++){
             if (requests[_market_id][i].market_id == _market_id && requests[_market_id][i].is_valid == true && requests[_market_id][i].tokenKind == searchKind) {
@@ -72,11 +72,11 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         address requester;
         uint index;
         uint8 searchKind;
-        if (_tokenKind == 0) {
-            searchKind = 1;
+        if (_tokenKind == 1) {
+            searchKind = 2;
         }
-        else if (_tokenKind == 1){
-            searchKind = 0;
+        else if (_tokenKind == 2){
+            searchKind = 1;
         }
         for (uint i = 0; i < requests[_market_id].length; i++){
             if (requests[_market_id][i].market_id == _market_id && requests[_market_id][i].is_valid == true && requests[_market_id][i].requestPrice == 1*10**18 -_acceptedPrice && requests[_market_id][i].tokenKind == searchKind) {
@@ -90,11 +90,11 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         require(ownerTransfer(requester, (1*10**18-_acceptedPrice))==true,"payment fail");
         
         //토큰분배
-        if (_tokenKind == 0) {
+        if (_tokenKind == 1) {
             super._yesCoin_mint(msg.sender, 1, _market_id);
             super._noCoin_mint(requests[_market_id][index].requester, 1, _market_id);
         }
-        else {
+        else if (_tokenKind == 2){
             super._noCoin_mint(msg.sender, 1, _market_id);
             super._yesCoin_mint(requests[_market_id][index].requester, 1, _market_id);
         }
