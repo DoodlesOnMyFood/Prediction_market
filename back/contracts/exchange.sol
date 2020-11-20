@@ -7,10 +7,10 @@ contract Exchange is TokenTrade {
     mapping (uint8 => uint8) internal _winnerTokenOf;
 
     modifier expirationCheck(uint8 _market_id, uint8 _tokenKind){
-        if (_tokenKind == 0){
+        if (_tokenKind == 1){
             require (block.timestamp > _expirationDateOf[_market_id], "the result is not happend yet");
         }
-        if (_tokenKind == 1){
+        if (_tokenKind == 2){
             require (block.timestamp > _expirationDateOf1[_market_id], "the result is not happend yet");
         }
         _;
