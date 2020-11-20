@@ -149,8 +149,8 @@ contract TokenTrade is ERC20Distribution {
 
     //현재 시세 보여주기.
     function showCurrent(uint8 _market_id, uint _i)public view returns (uint256[] memory resultYes, uint256[] memory resultNo){
-        uint256[] memory result1;
-        uint256[] memory result2;
+        uint256[] memory result1 = new uint256[](yesCoinP[_market_id].length);
+        uint256[] memory result2 = new uint256[](noCoinP[_market_id].length);
         for (uint i = _i; i< yesCoinP[_market_id].length ; i++){
             result1[i] = yesCoinP[_market_id][i];
         }
