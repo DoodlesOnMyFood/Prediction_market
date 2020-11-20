@@ -50,8 +50,12 @@ contract Manager is Exchange{
     
     function endMarket(uint8 _market_id) external onlyOwner returns (bool){
         delete _questionsOf[_market_id];
+        delete _totalSupply[_market_id];
+        delete _expirationDateOf[_market_id];
         is_over_distribute[_market_id] = false;
         delete _questionsOf1[_market_id];
+        delete _totalSupply1[_market_id];
+        delete _expirationDateOf1[_market_id];
         is_over_distribute1[_market_id] = false;
         return true;
     }
