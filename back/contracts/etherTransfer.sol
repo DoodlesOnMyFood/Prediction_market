@@ -11,35 +11,35 @@ contract WithdrawalContract is Ownable{
 
     //자기 잔고 충전
     function addToBalance() external payable returns (bool){
-        pendingWithdrawls[msg.sender].add(msg.value);
+        pendingWithdrawls[msg.sender] = pendingWithdrawls[msg.sender].add(msg.value);
         return true;
     }
 
     function addToOwnerPW() external payable onlyOwner returns (bool){
-        ownerPW.add(msg.value);
+        ownerPW = ownerPW.add(msg.value);
         return true;
     }
 
     //웨이 송금... owner제외
-    function weiTransfer(address _from,  address _to, uint256 _price) internal view returns (bool){
+    function weiTransfer(address _from,  address _to, uint256 _price) internal returns (bool){
         require(pendingWithdrawls[_from] >= _price, "Insufficient balance");
-        pendingWithdrawls[_from].sub(_price);
-        pendingWithdrawls[_to].add(_price);
+        pendingWithdrawls[_from] = pendingWithdrawls[_from].sub(_price);
+        pendingWithdrawls[_to] = pendingWithdrawls[_to].add(_price);
         return true;
     }
     //owner에게 송금. 이건 코인초기분배시 사용됨.
-    function ownerTransfer(address _from, uint256 _price) internal view returns (bool){
+    function ownerTransfer(address _from, uint256 _price) internal returns (bool){
         require(pendingWithdrawls[_from] >= _price, "Insufficient balance");
-        pendingWithdrawls[_from].sub(_price);
-        ownerPW.add(_price);
+        pendingWithdrawls[_from] = pendingWithdrawls[_from].sub(_price);
+        ownerPW = ownerPW.add(_price);
         return true;
     }
     
     //owner가 송금. 이건 토큰을 이더리움으로 교환 시 사용됨.
-    function rewardTransfer(address _to, uint256 _price) internal view returns (bool){
+    function rewardTransfer(address _to, uint256 _price) internal returns (bool){
         require(ownerPW >= _price, "Owner doesn't have enough money");
-        ownerPW.sub(_price);
-        pendingWithdrawls[_to].add(_price);
+        ownerPW = ownerPW.sub(_price);
+        pendingWithdrawls[_to] = pendingWithdrawls[_to].add(_price);
         return true;
     }
 
