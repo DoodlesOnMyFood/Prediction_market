@@ -24,15 +24,15 @@ contract TokenTrade is ERC20Distribution {
     mapping (address => mapping (uint8 => uint8)) private suggestCountOf;   //각 주소의 제안한 횟수 기록. 한 주소당 최대 10번 가능.
     mapping (address => mapping (uint8 => uint256[])) private suggestIdxOf;       //주소의 제안들 인덱스 기록.
     
-    event SuggestRemove(uint8 _del_market_id, uint8 _del_tokenKind, uint256 _del_price);
+    event SuggestRemove(uint8 _del_market_id, uint8 _del, uint256 _del_price);
     event NoFound(uint8 _del_market_id, uint8 _del_tokenKind, uint256 _del_price);
     event NoIndex();
 
     modifier expireCheck(uint8 _market_id, uint8 _tokenKind){
-       if (_tokenKind == 0){
+       if (_tokenKind == 1){
            require(_expirationDateOf[_market_id] >= block.timestamp, "expiration date is over");
        }
-       if (_tokenKind == 1){
+       if (_tokenKind == 2){
            require(_expirationDateOf1[_market_id] >= block.timestamp, "expiration date is over");
        }
        _;
@@ -43,10 +43,10 @@ contract TokenTrade is ERC20Distribution {
     function suggest(uint8 _market_id, uint8 _tokenKind, uint256 _price) external expireCheck(_market_id, _tokenKind) returns (bool){
         require(suggestCountOf[msg.sender][_market_id] <= 10, "Your suggests is full.");   //기존 제안갯수 확인.
         uint256 id;
-        if (_tokenKind == 0){
+        if (_tokenKind == 1){
             _transfer(msg.sender, owner, _market_id, 1);
         }
-        else if (_tokenKind == 1){
+        else if (_tokenKind == 2){
             _transfer1(msg.sender, owner, _market_id, 1);
         }
         suggests[_market_id].push(Suggest(_market_id, _tokenKind, msg.sender, _price, true));
@@ -66,18 +66,18 @@ contract TokenTrade is ERC20Distribution {
             if (suggests[_market_id][index].suggestPrice == _del_price && suggests[_market_id][index].market_id == _market_id && suggests[_market_id][index].tokenKind == _del_tokenKind){
                 suggests[_market_id][index].is_valid = false; 
                 suggestCountOf[msg.sender][_market_id]--;
-                 if (_tokenKind == 0){
+                 if (_tokenKind == 1){
                      _transfer(owner, msg.sender, _market_id, 1);
                 }
-                else if (_tokenKind == 1){
+                else if (_tokenKind == 2){
                     _transfer1(owner, msg.sender, _market_id, 1);
                 }
                 emit SuggestRemove(_market_id, _del_tokenKind, _del_price); 
                 //새로 추가. 
-                if (_tokenKind == 0){
+                if (_tokenKind == 1){
                      _transfer(msg.sender, owner, _market_id, 1);
                 }
-                else if (_tokenKind == 1){
+                else if (_tokenKind == 2){
                     _transfer1(msg.sender, owner, _market_id, 1);
                 }
                 suggests[_market_id].push(Suggest(_market_id, _tokenKind, msg.sender, _price, true));
@@ -124,7 +124,7 @@ contract TokenTrade is ERC20Distribution {
     function tradeWant(uint8 _market_id, uint8 _tokenKind, uint256 _price) public expireCheck(_market_id, _tokenKind) returns (bool){
         address suggester = lookup(_market_id, _tokenKind, _price);
         require(weiTransfer(msg.sender, suggester, _price) == true);
-        if (_tokenKind == 0){
+        if (_tokenKind == 1){
             _transfer(owner, msg.sender, _market_id, 1);
             count[_market_id][_tokenKind] ++;
             recentTrade[_market_id][_tokenKind]=recentTrade[_market_id][_tokenKind].add(_price);
@@ -134,7 +134,7 @@ contract TokenTrade is ERC20Distribution {
                 recentTrade[_market_id][_tokenKind] = 0;
             }
         }  
-        if (_tokenKind == 1){
+        if (_tokenKind == 2){
             _transfer1(owner, msg.sender, _market_id, 1);
              count[_market_id][_tokenKind] ++;
              recentTrade[_market_id][_tokenKind]=recentTrade[_market_id][_tokenKind].add(_price);
