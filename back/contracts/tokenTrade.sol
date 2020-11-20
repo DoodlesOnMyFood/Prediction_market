@@ -2,9 +2,12 @@ pragma solidity ^0.7.0;
 pragma experimental ABIEncoderV2;
 
 import "./erc20Distribution.sol";
+import "./safeMath.sol";
 
 //토큰거래!
 contract TokenTrade is ERC20Distribution {
+    using SafeMath for uint256;
+    
     struct Suggest {
         uint8 market_id;
         uint8 tokenKind;                          //tokenKind가 0이면 yescoin, 1이면 nocoin. 
@@ -125,7 +128,7 @@ contract TokenTrade is ERC20Distribution {
         if (_tokenKind == 0){
             _transfer(owner, msg.sender, _market_id, 1);
             count[_market_id][_tokenKind] ++;
-            recentTrade[_market_id][_tokenKind]+=_price;
+            recentTrade[_market_id][_tokenKind]=recentTrade[_market_id][_tokenKind].add(_price);
             if (count[_market_id][_tokenKind] == 5){
                 yesCoinP[_market_id].push(recentTrade[_market_id][_tokenKind]/5);
                 count[_market_id][_tokenKind] = 0;
@@ -135,7 +138,7 @@ contract TokenTrade is ERC20Distribution {
         if (_tokenKind == 1){
             _transfer1(owner, msg.sender, _market_id, 1);
              count[_market_id][_tokenKind] ++;
-             recentTrade[_market_id][_tokenKind]+=_price;
+             recentTrade[_market_id][_tokenKind]=recentTrade[_market_id][_tokenKind].add(_price);
             if (count[_market_id][_tokenKind] == 5){
                  noCoinP[_market_id].push(recentTrade[_market_id][_tokenKind]/5);
                  count[_market_id][_tokenKind] = 0;
