@@ -1,5 +1,4 @@
 pragma solidity ^0.7.0;
-pragma experimental ABIEncoderV2;
 
 import "./erc20Distribution.sol";
 import "./safeMath.sol";
