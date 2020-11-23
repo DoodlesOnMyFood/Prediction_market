@@ -3,7 +3,7 @@
 
 pragma solidity ^0.7.0;
 
-import "./context.sol";
+import "./owner.sol";
 import "./safeMath.sol";
 
 /**
@@ -30,12 +30,11 @@ import "./safeMath.sol";
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  */
-contract ERC20 is Context {
+contract ERC20 is Ownable {
     using SafeMath for uint256;
 
     mapping (address => mapping (uint8 => uint256)) private _balances;
-
-    mapping (address => mapping (address => mapping (uint8 => uint256))) private _allowances;
+    // mapping (address => mapping (address => mapping (uint8 => uint256))) private _allowances;
 
     mapping (uint8 => bool) internal is_over_distribute;  // market_id 당 distribute끝났는지 기록.
     mapping (uint8 => uint256) internal _totalSupply;
@@ -58,7 +57,7 @@ contract ERC20 is Context {
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
      * a call to {approve}. `value` is the new allowance.
      */
-    event Approval(address indexed owner, address indexed spender, uint8 _market_id, uint256 value);
+    // event Approval(address indexed owner, address indexed spender, uint8 _market_id, uint256 value);
     
     /**
      * @dev Sets the values for {name} and {symbol}, initializes {decimals} with
@@ -131,23 +130,15 @@ contract ERC20 is Context {
     function balanceOf(address account, uint8 _market_id) public view returns (uint256) {
         return _balances[account][_market_id];
     }
-
-    function market_ids() public view returns (uint8[] memory){
-        uint8[] memory result = new uint8[](_market_ids.length);
-        for (uint256 i = 0; i < _market_ids.length; i++){
-            result[i] = _market_ids[i];
-        }
-        return result;
-    }
     
-    function questionOf(uint8 _market_id) public view returns (string memory){
-        string memory result = _questionsOf[_market_id];
-        return result;
-    }
+    // function questionOf(uint8 _market_id) public view returns (string memory){
+    //     string memory result = _questionsOf[_market_id];
+    //     return result;
+    // }
 
-    function expirationDateOf(uint8 _market_id) public view returns (uint256){
-        return _expirationDateOf[_market_id];
-    }
+    // function expirationDateOf(uint8 _market_id) public view returns (uint256){
+    //     return _expirationDateOf[_market_id];
+    // }
 
     /**
      * @dev See {IERC20-transfer}.
