@@ -6,8 +6,7 @@ contract YesCoin is ERC20, ERC20Capped{
     uint8 private constant TOKENKIND = 1;
     string private constant NAME = "YesCoin";
     string private constant SYMBOL = "Yes";
-    uint256 private constant MAX_TOKEN_COUNT = 1000;    //1천개
-    uint256 private constant MAX_SUPPLY = MAX_TOKEN_COUNT;   // 토큰은 1시장당 yes coin 1천개, no coin 1천개가 발행된다.             
+    uint256 private constant MAX_SUPPLY =1000;   // 토큰은 1시장당 yes coin 1천개, no coin 1천개가 발행된다.             
 
     //yescoin 설정
     constructor() ERC20Capped(MAX_SUPPLY) ERC20(NAME, SYMBOL) {  
