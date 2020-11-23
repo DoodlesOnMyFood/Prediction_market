@@ -18,29 +18,26 @@ contract Manager is Exchange{
     
     function set_market_id(uint8 _market_id, string memory _question,  uint256 _expiration_date) external onlyOwner returns (bool){
         if (_already_market_id(_market_id) == true){
-            if ( is_over_distribute[_market_id] = true){
+            if ( is_over_distribute[_market_id] == true){
                 is_over_distribute[_market_id] = false;
-                return true;
             }
         }
         else {
             _market_ids.push(_market_id);
-            return true;
         }
         _questionsOf[_market_id] = _question;
         _expirationDateOf[_market_id] = _expiration_date;
         if (_already_market_id1(_market_id) == true){
-            if ( is_over_distribute1[_market_id] = true){
+            if ( is_over_distribute1[_market_id] == true){
                 is_over_distribute1[_market_id] = false;
-                return true;
             }
         }
         else {
             _market_ids1.push(_market_id);
-            return true;
         }
         _questionsOf1[_market_id] = _question;
         _expirationDateOf1[_market_id] = _expiration_date;
+        return true;
     }
     
     function setWinner(uint8 _market_id, uint8 _tokenKind) external onlyOwner returns (bool){
