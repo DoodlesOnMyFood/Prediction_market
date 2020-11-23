@@ -1,13 +1,11 @@
 pragma solidity 0.7.0;
-
 import "./erc20Capped1.sol";
 
 contract NoCoin is ERC201, ERC20Capped1{
     uint8 private constant TOKENKIND1 = 2;
     string private constant NAME1 = "NoCoin";
     string private constant SYMBOL1 = "No";
-    uint256 private constant MAX_TOKEN_COUNT1 = 1000;    //1천개
-    uint256 private constant MAX_SUPPLY1 = MAX_TOKEN_COUNT1;   // 토큰은 1시장당 yes coin 1천개, no coin 1천개가 발행된다.             
+    uint256 private constant MAX_SUPPLY1 = 1000;   // 토큰은 1시장당 yes coin 1천개, no coin 1천개가 발행된다.             
     
     //nocoin 설정
     constructor() ERC20Capped1(MAX_SUPPLY1) ERC201(NAME1, SYMBOL1) {
