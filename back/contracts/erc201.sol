@@ -3,7 +3,7 @@
 
 pragma solidity ^0.7.0;
 
-import "./context.sol";
+import "./owner.sol";
 import "./safeMath.sol";
 
 /**
@@ -30,17 +30,17 @@ import "./safeMath.sol";
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IERC20-approve}.
  */
-contract ERC201 is Context {
+contract ERC201 is Ownable {
     using SafeMath for uint256;
 
     mapping (address => mapping (uint8 => uint256)) private _balances1;
 
-    mapping (address => mapping (address => mapping (uint8 => uint256))) private _allowances1;
+    // mapping (address => mapping (address => mapping (uint8 => uint256))) private _allowances1;
 
     mapping (uint8 => bool) internal is_over_distribute1;  // market_id 당 distribute끝났는지 기록.
     mapping (uint8 => uint256) internal _totalSupply1;
     mapping (uint8 => uint256) internal _expirationDateOf1;
-     mapping (uint8 => string) internal _questionsOf1;
+    mapping (uint8 => string) internal _questionsOf1;
     
     string private _name1;
     string private _symbol1;
@@ -59,7 +59,7 @@ contract ERC201 is Context {
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
      * a call to {approve}. `value` is the new allowance.
      */
-    event Approval1(address indexed owner, address indexed spender, uint8 _market_id, uint256 value);
+    // event Approval1(address indexed owner, address indexed spender, uint8 _market_id, uint256 value);
     
     /**
      * @dev Sets the values for {name} and {symbol}, initializes {decimals} with
@@ -76,15 +76,15 @@ contract ERC201 is Context {
         _decimals1 = 18;
     }
     
-      //market_ids 안에 이미 존재하는지 체크;
-    function _already_market_id1(uint8 _market_id) internal view returns (bool) {
-        for (uint i = 0; i < _market_ids1.length; i++) {
-            if (_market_ids1[i] == _market_id) {
-                return true;
-            }
-        }
-        return false;
-    }
+    //   //market_ids 안에 이미 존재하는지 체크;
+    // function _already_market_id1(uint8 _market_id) internal view returns (bool) {
+    //     for (uint i = 0; i < _market_ids1.length; i++) {
+    //         if (_market_ids1[i] == _market_id) {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
 
     /**
      * @dev Returns the name of the token.
