@@ -1,5 +1,4 @@
 pragma solidity ^0.7.0;
-
 import "./etherTransfer.sol";
 import "./yescoin.sol";
 import "./nocoin.sol";
@@ -102,6 +101,4 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         alreadyRequest[requester][_market_id] = false;
         delete requestIdOf[requester][_market_id];
     }
-
-    
 }
