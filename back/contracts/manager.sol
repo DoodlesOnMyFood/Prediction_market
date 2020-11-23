@@ -1,5 +1,5 @@
 pragma solidity ^0.7.0;
-
+pragma experimental ABIEncoderV2;
 import "./exchange.sol";
 
 contract Manager is Exchange{
@@ -20,21 +20,15 @@ contract Manager is Exchange{
         if (_already_market_id(_market_id) == true){
             if ( is_over_distribute[_market_id] == true){
                 is_over_distribute[_market_id] = false;
-            }
-        }
-        else {
-            _market_ids.push(_market_id);
-        }
-        _questionsOf[_market_id] = _question;
-        _expirationDateOf[_market_id] = _expiration_date;
-        if (_already_market_id1(_market_id) == true){
-            if ( is_over_distribute1[_market_id] == true){
                 is_over_distribute1[_market_id] = false;
             }
         }
         else {
+            _market_ids.push(_market_id);
             _market_ids1.push(_market_id);
         }
+        _questionsOf[_market_id] = _question;
+        _expirationDateOf[_market_id] = _expiration_date;
         _questionsOf1[_market_id] = _question;
         _expirationDateOf1[_market_id] = _expiration_date;
         return true;
@@ -56,5 +50,17 @@ contract Manager is Exchange{
         delete _expirationDateOf1[_market_id];
         is_over_distribute1[_market_id] = false;
         return true;
+    }
+    
+    function marketData() public view returns (uint8[] memory, string[] memory, uint256[] memory){
+        uint8[] memory ids = new uint8[](_market_ids.length);
+        string[] memory questions = new string[](_market_ids.length);
+        uint256[] memory expirationDates = new uint256[](_market_ids.length);
+        for (uint i = 0; i < _market_ids.length; i++){
+            ids[i] = _market_ids[i];
+            questions[i] = _questionsOf[ids[i]];
+            expirationDates[i] = _expirationDateOf[ids[i]];
+        }
+        return (ids, questions, expirationDates);
     }
 }
