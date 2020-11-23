@@ -91,12 +91,12 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         
         //토큰분배
         if (_tokenKind == 1) {
-            super._yesCoin_mint(msg.sender, 1, _market_id);
-            super._noCoin_mint(requests[_market_id][index].requester, 1, _market_id);
+            super._yesCoin_mint(msg.sender,_market_id, 1);
+            super._noCoin_mint(requests[_market_id][index].requester, _market_id, 1);
         }
         else if (_tokenKind == 2){
-            super._noCoin_mint(msg.sender, 1, _market_id);
-            super._yesCoin_mint(requests[_market_id][index].requester, 1, _market_id);
+            super._noCoin_mint(msg.sender, _market_id, 1);
+            super._yesCoin_mint(requests[_market_id][index].requester, _market_id, 1);
         }
         requests[_market_id][index].is_valid = false;
         alreadyRequest[requester][_market_id] = false;
