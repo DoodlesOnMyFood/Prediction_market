@@ -1,5 +1,4 @@
 pragma solidity ^0.7.0;
-
 import "./erc20Distribution.sol";
 import "./safeMath.sol";
 
@@ -28,19 +27,14 @@ contract TokenTrade is ERC20Distribution {
     event NoFound(uint8 _del_market_id, uint8 _del_tokenKind, uint256 _del_price);
     event NoIndex();
 
-    modifier expireCheck(uint8 _market_id, uint8 _tokenKind){
-       if (_tokenKind == 1){
-           require(_expirationDateOf[_market_id] >= block.timestamp, "expiration date is over");
-       }
-       if (_tokenKind == 2){
-           require(_expirationDateOf1[_market_id] >= block.timestamp, "expiration date is over");
-       }
-       _;
+    modifier expireCheck(uint8 _market_id){
+        require(_expirationDateOf[_market_id] >= block.timestamp, "expiration date is over");
+        _;
         
     }
 
     //거래가격들 기록. 한 주소당 10개 제안가능. 제안갯수 초과시 기존제안 취소하고 다시 제안. 
-    function suggest(uint8 _market_id, uint8 _tokenKind, uint256 _price) external expireCheck(_market_id, _tokenKind) returns (bool){
+    function suggest(uint8 _market_id, uint8 _tokenKind, uint256 _price) external expireCheck(_market_id) returns (bool){
         require(suggestCountOf[msg.sender][_market_id] <= 10, "Your suggests is full.");   //기존 제안갯수 확인.
         uint256 id;
         if (_tokenKind == 1){
@@ -57,7 +51,7 @@ contract TokenTrade is ERC20Distribution {
     }
 
     //제안했던거 바꾸기. 한 번 제안한 것은 새로운 제안으로 바꾸지 않으면 지워지지 않으므로 신중히 제안한다.
-    function suggestChange(uint8 _market_id, uint8 _del_tokenKind, uint256 _del_price, uint8 _tokenKind, uint256 _price) external expireCheck(_market_id, _tokenKind) returns (bool){
+    function suggestChange(uint8 _market_id, uint8 _del_tokenKind, uint256 _del_price, uint8 _tokenKind, uint256 _price) external expireCheck(_market_id) returns (bool){
         uint256 index;
         uint256 id;
         //우선 지울 걸 찾는다.
@@ -96,7 +90,7 @@ contract TokenTrade is ERC20Distribution {
     }    
 
     //제안 보여주기. 
-    function showSuggest(uint8 _market_id, uint8 _tokenKind) external view expireCheck(_market_id, _tokenKind) returns (uint256[] memory) {
+    function showSuggest(uint8 _market_id, uint8 _tokenKind) external view expireCheck(_market_id) returns (uint256[] memory) {
         uint[] memory result = new uint[] (suggests[_market_id].length);
         uint counter;
         for (uint i = 0; i < suggests[_market_id].length; i++){
@@ -121,7 +115,7 @@ contract TokenTrade is ERC20Distribution {
     }
 
     //토큰 거래 시 노트생성. 만약 같은 가격이면 앞 사람것이 먼저 거래됨.
-    function tradeWant(uint8 _market_id, uint8 _tokenKind, uint256 _price) public expireCheck(_market_id, _tokenKind) returns (bool){
+    function tradeWant(uint8 _market_id, uint8 _tokenKind, uint256 _price) public expireCheck(_market_id) returns (bool){
         address suggester = lookup(_market_id, _tokenKind, _price);
         require(weiTransfer(msg.sender, suggester, _price) == true);
         if (_tokenKind == 1){
