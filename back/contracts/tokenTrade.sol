@@ -1,4 +1,5 @@
 pragma solidity ^0.7.0;
+
 import "./erc20Distribution.sol";
 import "./safeMath.sol";
 
@@ -13,10 +14,12 @@ contract TokenTrade is ERC20Distribution {
         uint256 suggestPrice;         //1c당 ether가격
         bool is_valid;
     }
-    mapping (uint8 => mapping (uint8 => uint8)) private count; //for market id, token kind, trade count 
-    mapping (uint8 => mapping (uint8 => uint256)) private recentTrade; 
-    mapping (uint8 => uint256[]) private yesCoinP;
-    mapping (uint8 => uint256[]) private noCoinP;
+    struct priceLog {
+        uint256 price;       
+        uint256 timestamp;
+    }
+    mapping (uint8 => priceLog[]) private yesCoinP;
+    mapping (uint8 => priceLog[]) private noCoinP;
 
     mapping (uint8 => Suggest[]) private suggests;  //시장 id당 제안들
 
@@ -27,14 +30,19 @@ contract TokenTrade is ERC20Distribution {
     event NoFound(uint8 _del_market_id, uint8 _del_tokenKind, uint256 _del_price);
     event NoIndex();
 
-    modifier expireCheck(uint8 _market_id){
-        require(_expirationDateOf[_market_id] >= block.timestamp, "expiration date is over");
-        _;
+    modifier expireCheck(uint8 _market_id, uint8 _tokenKind){
+       if (_tokenKind == 1){
+           require(_expirationDateOf[_market_id] >= block.timestamp, "expiration date is over");
+       }
+       if (_tokenKind == 2){
+           require(_expirationDateOf1[_market_id] >= block.timestamp, "expiration date is over");
+       }
+       _;
         
     }
 
     //거래가격들 기록. 한 주소당 10개 제안가능. 제안갯수 초과시 기존제안 취소하고 다시 제안. 
-    function suggest(uint8 _market_id, uint8 _tokenKind, uint256 _price) external expireCheck(_market_id) returns (bool){
+    function suggest(uint8 _market_id, uint8 _tokenKind, uint256 _price) external expireCheck(_market_id, _tokenKind) returns (bool){
         require(suggestCountOf[msg.sender][_market_id] <= 10, "Your suggests is full.");   //기존 제안갯수 확인.
         uint256 id;
         if (_tokenKind == 1){
@@ -51,7 +59,7 @@ contract TokenTrade is ERC20Distribution {
     }
 
     //제안했던거 바꾸기. 한 번 제안한 것은 새로운 제안으로 바꾸지 않으면 지워지지 않으므로 신중히 제안한다.
-    function suggestChange(uint8 _market_id, uint8 _del_tokenKind, uint256 _del_price, uint8 _tokenKind, uint256 _price) external expireCheck(_market_id) returns (bool){
+    function suggestChange(uint8 _market_id, uint8 _del_tokenKind, uint256 _del_price, uint8 _tokenKind, uint256 _price) external expireCheck(_market_id, _tokenKind) returns (bool){
         uint256 index;
         uint256 id;
         //우선 지울 걸 찾는다.
@@ -90,7 +98,7 @@ contract TokenTrade is ERC20Distribution {
     }    
 
     //제안 보여주기. 
-    function showSuggest(uint8 _market_id, uint8 _tokenKind) external view expireCheck(_market_id) returns (uint256[] memory) {
+    function showSuggest(uint8 _market_id, uint8 _tokenKind) external view expireCheck(_market_id, _tokenKind) returns (uint256[] memory) {
         uint[] memory result = new uint[] (suggests[_market_id].length);
         uint counter;
         for (uint i = 0; i < suggests[_market_id].length; i++){
@@ -102,55 +110,96 @@ contract TokenTrade is ERC20Distribution {
         return result;
     }
 
-    function lookup (uint8 _market_id, uint8 _tokenKind, uint256 _price) internal view returns (address){
+    function lookup (uint8 _market_id, uint8 _tokenKind, uint256 _price) internal returns (address){
         address suggester;
         for (uint i = 0; i < suggests[_market_id].length; i++){
             if (suggests[_market_id][i].is_valid == true){
                 if (suggests[_market_id][i].market_id == _market_id && suggests[_market_id][i].tokenKind == _tokenKind && suggests[_market_id][i].suggestPrice == _price){
                     suggester = suggests[_market_id][i].suggester;
+                    delete suggests[_market_id][i];
                     return suggester;
                 }
             }
         } 
+        return address(0);
     }
 
     //토큰 거래 시 노트생성. 만약 같은 가격이면 앞 사람것이 먼저 거래됨.
-    function tradeWant(uint8 _market_id, uint8 _tokenKind, uint256 _price) public expireCheck(_market_id) returns (bool){
+    function tradeWant(uint8 _market_id, uint8 _tokenKind, uint256 _price) public expireCheck(_market_id, _tokenKind) returns (bool){
         address suggester = lookup(_market_id, _tokenKind, _price);
-        require(weiTransfer(msg.sender, suggester, _price) == true);
-        if (_tokenKind == 1){
-            _transfer(owner, msg.sender, _market_id, 1);
-            count[_market_id][_tokenKind] ++;
-            recentTrade[_market_id][_tokenKind]=recentTrade[_market_id][_tokenKind].add(_price);
-            if (count[_market_id][_tokenKind] == 5){
-                yesCoinP[_market_id].push(recentTrade[_market_id][_tokenKind]/5);
-                count[_market_id][_tokenKind] = 0;
-                recentTrade[_market_id][_tokenKind] = 0;
+        if(suggester != address(0)){
+            require(weiTransfer(msg.sender, suggester, _price) == true);
+            if (_tokenKind == 1){
+                _transfer(owner, msg.sender, _market_id, 1);
+                yesCoinP[_market_id].push(priceLog(_price, block.timestamp));
+            }  
+            if (_tokenKind == 2){
+                _transfer1(owner, msg.sender, _market_id, 1);
+                 noCoinP[_market_id].push(priceLog(_price, block.timestamp));
             }
-        }  
-        if (_tokenKind == 2){
-            _transfer1(owner, msg.sender, _market_id, 1);
-             count[_market_id][_tokenKind] ++;
-             recentTrade[_market_id][_tokenKind]=recentTrade[_market_id][_tokenKind].add(_price);
-            if (count[_market_id][_tokenKind] == 5){
-                 noCoinP[_market_id].push(recentTrade[_market_id][_tokenKind]/5);
-                 count[_market_id][_tokenKind] = 0;
-                 recentTrade[_market_id][_tokenKind] = 0;
-            }
+            return true;
         }
-        return true;
+        return false;
     }
 
     //현재 시세 보여주기.
-    function showCurrent(uint8 _market_id, uint _i)public view returns (uint256[] memory resultYes, uint256[] memory resultNo){
-        uint256[] memory result1 = new uint256[](yesCoinP[_market_id].length);
-        uint256[] memory result2 = new uint256[](noCoinP[_market_id].length);
+    function showCurrent(uint8 _market_id, uint _i)public view returns (uint256[] memory priceYes, uint256[] memory timeYes, uint256[] memory priceNo, uint256[] memory timeNo){
+        uint256[] memory price1 = new uint256[](yesCoinP[_market_id].length);
+        uint256[] memory time1 = new uint256[](yesCoinP[_market_id].length);
+        uint256[] memory price2 = new uint256[](yesCoinP[_market_id].length);
+        uint256[] memory time2 = new uint256[](noCoinP[_market_id].length);
         for (uint i = _i; i< yesCoinP[_market_id].length ; i++){
-            result1[i] = yesCoinP[_market_id][i];
+            price1[i] = yesCoinP[_market_id][i].price;
+            time1[i] = yesCoinP[_market_id][i].timestamp;
         }
         for(uint i = _i; i< noCoinP[_market_id].length ; i++){
-            result2[i] = noCoinP[_market_id][i];
+            price2[i] = yesCoinP[_market_id][i].price;
+            time2[i] = yesCoinP[_market_id][i].timestamp;
         }
-        return (result1, result2);
+        return (price1, time1, price2, time2);
     } 
+    
+    //요청수락이 들어오면 분배. 단, 요청한 가격의 유효한 거래가 앞에 있는 것부터 나감.
+    function distribute(uint8 _market_id, uint8 _tokenKind, uint256 _acceptedPrice) external marketCheck(_market_id) returns (bool){
+        address requester;
+        uint index;
+        uint8 searchKind;
+        if (_tokenKind == 1) {
+            searchKind = 2;
+        }
+        else if (_tokenKind == 2){
+            searchKind = 1;
+        }
+        for (uint i = 0; i < requests[_market_id].length; i++){
+            if (requests[_market_id][i].market_id == _market_id && requests[_market_id][i].is_valid == true && requests[_market_id][i].requestPrice == 1*10**18 -_acceptedPrice && requests[_market_id][i].tokenKind == searchKind) {
+                index = i;
+                requester = requests[_market_id][i].requester;       
+            }
+            else return false;
+        }
+        //이더리움 송금.
+        require(ownerTransfer(msg.sender, _acceptedPrice)==true, "payment fail");
+        require(ownerTransfer(requester, (1*10**18-_acceptedPrice))==true,"payment fail");
+        if (_tokenKind == 1) {
+            yesCoinP[_market_id].push(priceLog(_acceptedPrice, block.timestamp));
+            noCoinP[_market_id].push(priceLog(1*10**18 - _acceptedPrice, block.timestamp));
+        }
+        else if (_tokenKind == 2){
+            noCoinP[_market_id].push(priceLog(_acceptedPrice, block.timestamp));
+            yesCoinP[_market_id].push(priceLog(1*10**18 - _acceptedPrice, block.timestamp));
+        }
+        //토큰분배
+        if (_tokenKind == 1) {
+            super._yesCoin_mint(msg.sender, _market_id, 1);
+            super._noCoin_mint(requests[_market_id][index].requester, _market_id, 1);
+        }
+        else if (_tokenKind == 2){
+            super._noCoin_mint(msg.sender, _market_id, 1);
+            super._yesCoin_mint(requests[_market_id][index].requester, _market_id, 1);
+        }
+        requests[_market_id][index].is_valid = false;
+        alreadyRequest[requester][_market_id] = false;
+        delete requestIdOf[requester][_market_id];
+    }
 }
+

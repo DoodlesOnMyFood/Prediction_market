@@ -7,7 +7,103 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+@font-face {
+  font-family: BigShoulderStencilDisplay;
+  src: url("./fonts/BigShouldersStencilDisplay-Bold.ttf");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: Goldman-Bold;
+  src: url("./fonts/Goldman-Bold.ttf");
+  font-weight: bold;
+}
+
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.initArrow{
+  position : absolute;
+  right : 0px;
+  top: 50%;
+  height : 30%;
+  margin-right: 10px;
+  transform: translate(0, -50%);
+}
+
+.rightArrow{
+  position : absolute;
+  right : 0px;
+  top: 50%;
+  height : 30%;
+  margin-right: 10px;
+  transform: translate(0, -50%);
+  animation-name: rightToDown;
+  animation-duration: 0.2s;
+  animation-direction: reverse;
+}
+
+.downArrow{
+  position : absolute;
+  right : 0px;
+  top: 50%;
+  height : 30%;
+  margin-right: 10px;
+  transform: translate(0, -50%) rotate(90deg);  
+  animation-name: downToRight;
+  animation-duration: 0.2s;
+  animation-direction: reverse;
+}
+
+.scrollContainer{
+  overflow-y: scroll;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.scrollContainer {
+-ms-overflow-style: none;  /* IE and Edge */
+scrollbar-width: none;  /* Firefox */
+}
+
+@keyframes downToRight {
+  from {
+    position : absolute;
+    right : 0px;
+    top: 50%;
+    height : 30%;
+    margin-right: 10px;
+    transform: translate(0, -50%) rotate(90deg);  
+  } to {
+    position : absolute;
+    right : 0px;
+    top: 50%;
+    height : 30%;
+    margin-right: 10px;
+    transform: translate(0, -50%);
+  }
+}
+
+@keyframes rightToDown {
+  from {
+    position : absolute;
+    right : 0px;
+    top: 50%;
+    height : 30%;
+    margin-right: 10px;
+    transform: translate(0, -50%);
+  } to {
+    position : absolute;
+    right : 0px;
+    top: 50%;
+    height : 30%;
+    margin-right: 10px;
+    transform: translate(0, -50%) rotate(90deg);  
+  } 
 }

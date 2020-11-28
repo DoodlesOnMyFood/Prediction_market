@@ -1,4 +1,5 @@
 pragma solidity ^0.7.0;
+
 import "./etherTransfer.sol";
 import "./yescoin.sol";
 import "./nocoin.sol";
@@ -12,7 +13,7 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         bool is_valid;
     }
 
-    mapping (uint8 => Request[]) private requests;
+    mapping (uint8 => Request[]) internal requests;
 
     
     mapping (address => mapping (uint8 => uint256)) internal requestIdOf;
@@ -57,6 +58,7 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         else if (_tokenKind == 2){
             searchKind = 1;
         }
+
         for (uint i = 0; i < requests[_market_id].length; i++){
             if (requests[_market_id][i].market_id == _market_id && requests[_market_id][i].is_valid == true && requests[_market_id][i].tokenKind == searchKind) {
                 result[idx] = 1*10**18 - (requests[_market_id][i].requestPrice);
@@ -66,39 +68,8 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         return result;
     }
 
-    //요청수락이 들어오면 분배. 단, 요청한 가격의 유효한 거래가 앞에 있는 것부터 나감.
-    function distribute(uint8 _market_id, uint8 _tokenKind, uint256 _acceptedPrice) external marketCheck(_market_id) returns (bool){
-        address requester;
-        uint index;
-        uint8 searchKind;
-        if (_tokenKind == 1) {
-            searchKind = 2;
-        }
-        else if (_tokenKind == 2){
-            searchKind = 1;
-        }
-        for (uint i = 0; i < requests[_market_id].length; i++){
-            if (requests[_market_id][i].market_id == _market_id && requests[_market_id][i].is_valid == true && requests[_market_id][i].requestPrice == 1*10**18 -_acceptedPrice && requests[_market_id][i].tokenKind == searchKind) {
-                index = i;
-                requester = requests[_market_id][i].requester;       
-            }
-            else return false;
-        }
-        //이더리움 송금.
-        require(ownerTransfer(msg.sender, _acceptedPrice)==true, "payment fail");
-        require(ownerTransfer(requester, (1*10**18-_acceptedPrice))==true,"payment fail");
-        
-        //토큰분배
-        if (_tokenKind == 1) {
-            super._yesCoin_mint(msg.sender,_market_id, 1);
-            super._noCoin_mint(requests[_market_id][index].requester, _market_id, 1);
-        }
-        else if (_tokenKind == 2){
-            super._noCoin_mint(msg.sender, _market_id, 1);
-            super._yesCoin_mint(requests[_market_id][index].requester, _market_id, 1);
-        }
-        requests[_market_id][index].is_valid = false;
-        alreadyRequest[requester][_market_id] = false;
-        delete requestIdOf[requester][_market_id];
-    }
+    
+
+    
 }
+
