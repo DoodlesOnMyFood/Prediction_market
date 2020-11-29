@@ -131,10 +131,10 @@ export default ( { question, id, deadLine, account, contract, openDetails } ) =>
                     </thead>
                     <tbody>
                         <tr>
-                            <td rowSpan="3" style={{ display :"table-cell", verticalAlign : 'middle', }}>Market Info</td>
+                            <td rowSpan="3" style={{ display :"table-cell", verticalAlign : 'middle' }}>Market Info</td>
                             <td>Market Cap : {1000 - minted}</td>
                             <td>Deadline : {_deadline}</td>
-                            <td rowSpan="3"><Button style={{width:'100%', height: '100%'}} onClick={() => {openDetails({
+                            <td rowSpan="3" style={{ display :"table-cell", verticalAlign : 'middle' }}><Button style={{width:'100%', height: '100%'}} onClick={() => {openDetails({
                                 question : question,
                                 id : id,
                                 deadLine : _deadline

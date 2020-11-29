@@ -13,7 +13,7 @@ import SingleExchange from "./SingleExchange"
 import {SendNewExchange} from "./Helpers"
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
-import detailsMode from "./Details"
+import DetailsMode from "./Details"
 
 function App() {
   const [account, setAccount] = useState(null)
@@ -138,7 +138,7 @@ function App() {
         </Col>
       </Row>
     </Container>
-    {details ? detailsMode(details) : frontPage()}
+    {details ? <DetailsMode question={details.question} id={details.id} deadLine={details.deadLine} contract={contract.current} account={account} /> : frontPage()}
     </div>
   );
 }
