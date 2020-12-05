@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from "react"
+import React, {useState, useEffect} from "react"
 import Accordion from "react-bootstrap/Accordion"
 import Button from "react-bootstrap/Button"
 import Card from "react-bootstrap/Card"
@@ -8,9 +8,7 @@ import { useAccordionToggle } from 'react-bootstrap/AccordionToggle'
 import Spinner from "react-bootstrap/Spinner"
 import {LogDetail} from "./Helpers"
 
-
-
-export default ( { question, id, deadLine, account, contract, openDetails } ) => {
+const SingleExchange = ( { question, id, deadLine, account, contract, openDetails, web3, done } ) => {
     const [open, setOpen] = useState(null)
     const [spin, setSpin] = useState(true)
     const [date, setDate] = useState(null)
@@ -29,16 +27,16 @@ export default ( { question, id, deadLine, account, contract, openDetails } ) =>
         if(open){
             (async () => {
                 setDate(new Date(parseInt(deadLine) * 1000))
-                let _yesCoin = contract.methods.balanceOf(account, id).call()
-                let _noCoin = contract.methods.balanceOf1(account, id).call()
-                let _balance = contract.methods.getPW().call()
-                let _log = contract.methods.showCurrent(id, 0).call()
-                let _suggestYes = contract.methods.showSuggest(id, 1).call()
-                let _suggestNo = contract.methods.showSuggest(id, 2).call()
-                let _requestNo = contract.methods.showRequest(id, 2).call()
-                let _requestYes = contract.methods.showRequest(id, 1).call()
-                let _minted = contract.methods.totalSupplyOf(id).call()
-
+                let _yesCoin = contract.methods.balanceOf(account, id).call({from : account})
+                let _noCoin = contract.methods.balanceOf1(account, id).call({from : account})
+                let _balance = contract.methods.getPW().call({from : account})
+                let _log = contract.methods.showCurrent(id, 0).call({from : account})
+                let _suggestYes = contract.methods.showSuggest(id, 1).call({from : account})
+                let _suggestNo = contract.methods.showSuggest(id, 2).call({from : account})
+                let _requestNo = contract.methods.showRequest(id, 2).call({from : account})
+                let _requestYes = contract.methods.showRequest(id, 1).call({from : account})
+                let _minted = contract.methods.totalSupplyOf(id).call({from : account})
+                console.log(_log)
                 return {
                     _noCoin : await _noCoin,
                     _balance : await _balance,
@@ -61,10 +59,13 @@ export default ( { question, id, deadLine, account, contract, openDetails } ) =>
                 setMinted(ret._minted)
                 setYesCoin(ret._yesCoin)
                 setRequestYes(ret._requestYes)
+            })
+            .then(() => {
                 setSpin(false)
             })
+            .catch(e => console.log(e))
         }
-
+// eslint-disable-next-line
     }, [open])
 
     const ArrowHead = () => {
@@ -83,7 +84,7 @@ export default ( { question, id, deadLine, account, contract, openDetails } ) =>
                     return true
                 }
                 return !prev
-            })}}/>
+            })}} alt=""/>
         )
     }
     const spinny = () => {
@@ -101,32 +102,33 @@ export default ( { question, id, deadLine, account, contract, openDetails } ) =>
         let month = date.getMonth() + 1
         let _date = date.getDate()
         if(hours < 10){
-            hours = '0' + `${hours}`
+            hours = `0${hours}`
             console.log(hours)
         }
         if(minutes < 10){
-            minutes = '0' + `${minutes}`
+            minutes = `0${minutes}`
         }
         if(seconds < 10){
-            seconds = '0' + `${seconds}`
+            seconds = `0${seconds}`
         }
         if(month < 10){
-            month = '0' + `${month}`
+            month = `0${month}`
         }
         if(_date < 10){
-            _date = '0' + `${_date}`
+            _date = `0${_date}`
         }
         const _deadline = `${date.getFullYear()}-${month}-${_date} ${hours}:${minutes}:${seconds}`
         const logDetails = LogDetail(log)
+        const color = done ? {fontSize : '1.4rem', color : "white"} : {fontSize : '1.4rem', color : "black"}
         return (
             <>
-               <Table style={{fontSize : '1.4rem'}}>
+               <Table style={color}>
                     <thead>
                         <tr>
-                        <th>User Info</th>
-                        <th>Yes Coins : {yesCoin}</th>
-                        <th>No Coins : {noCoin}</th>
-                        <th>Balance : {balance}</th>
+                            <th>User Info</th>
+                            <th>Yes Coins : {yesCoin}</th>
+                            <th>No Coins : {noCoin}</th>
+                            <th>Balance : {web3.utils.fromWei(balance)} eth</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,16 +139,16 @@ export default ( { question, id, deadLine, account, contract, openDetails } ) =>
                             <td rowSpan="3" style={{ display :"table-cell", verticalAlign : 'middle' }}><Button style={{width:'100%', height: '100%'}} onClick={() => {openDetails({
                                 question : question,
                                 id : id,
-                                deadLine : _deadline
+                                deadLine : date
                             })}}>More Details</Button></td>
                         </tr>
                         <tr>
-                            <td>Yes Coin Price : N/A</td>
-                            <td>No Coin Price : N/A</td>
+                            <td>Yes Coin Price : {logDetails.yesPrice === 'N/A' ? logDetails.yesPrice : web3.utils.fromWei(logDetails.yesPrice)}</td>
+                            <td>No Coin Price : {logDetails.noPrice === 'N/A' ? logDetails.noPrice : web3.utils.fromWei(logDetails.noPrice)}</td>
                         </tr>
                         <tr>
                             <td>Activity : {suggestYes.length + suggestNo.length + requestYes.length + requestNo.length} </td>
-                            <td>Recent Trade : N/A</td>
+                            <td>Recent Trade : {logDetails.recentTime}</td>
                         </tr>
                     </tbody>
                </Table>
@@ -156,7 +158,7 @@ export default ( { question, id, deadLine, account, contract, openDetails } ) =>
     const bodyStyle = spin ? {display:'flex', justifyContent: "center", marginTop: "60px", marginBottom: "60px"} : {fontSize : "1.5rem"}
     return (
         <Accordion >
-            <Card>
+            <Card style={done ? {backgroundColor : '#444444', color:'white', marginTop : "5px"} : {color: 'black', marginTop : "5px"}}>
                 <Card.Header style={{position : "relative"}}>
                 {question}
                 <ArrowHead />
@@ -172,3 +174,6 @@ export default ( { question, id, deadLine, account, contract, openDetails } ) =>
         </Accordion>
     )
 }
+
+
+export default SingleExchange

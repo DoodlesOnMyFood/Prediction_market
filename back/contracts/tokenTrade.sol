@@ -18,6 +18,7 @@ contract TokenTrade is ERC20Distribution {
         uint256 price;       
         uint256 timestamp;
     }
+    event DistributeEmit(bool a, bool b, bool c, bool d);
     mapping (uint8 => priceLog[]) private yesCoinP;
     mapping (uint8 => priceLog[]) private noCoinP;
 
@@ -30,16 +31,7 @@ contract TokenTrade is ERC20Distribution {
     event NoFound(uint8 _del_market_id, uint8 _del_tokenKind, uint256 _del_price);
     event NoIndex();
 
-    modifier expireCheck(uint8 _market_id, uint8 _tokenKind){
-       if (_tokenKind == 1){
-           require(_expirationDateOf[_market_id] >= block.timestamp, "expiration date is over");
-       }
-       if (_tokenKind == 2){
-           require(_expirationDateOf1[_market_id] >= block.timestamp, "expiration date is over");
-       }
-       _;
-        
-    }
+    
 
     //거래가격들 기록. 한 주소당 10개 제안가능. 제안갯수 초과시 기존제안 취소하고 다시 제안. 
     function suggest(uint8 _market_id, uint8 _tokenKind, uint256 _price) external expireCheck(_market_id, _tokenKind) returns (bool){
@@ -98,7 +90,7 @@ contract TokenTrade is ERC20Distribution {
     }    
 
     //제안 보여주기. 
-    function showSuggest(uint8 _market_id, uint8 _tokenKind) external view expireCheck(_market_id, _tokenKind) returns (uint256[] memory) {
+    function showSuggest(uint8 _market_id, uint8 _tokenKind) external view returns (uint256[] memory) {
         uint[] memory result = new uint[] (suggests[_market_id].length);
         uint counter;
         for (uint i = 0; i < suggests[_market_id].length; i++){
@@ -146,22 +138,22 @@ contract TokenTrade is ERC20Distribution {
     function showCurrent(uint8 _market_id, uint _i)public view returns (uint256[] memory priceYes, uint256[] memory timeYes, uint256[] memory priceNo, uint256[] memory timeNo){
         uint256[] memory price1 = new uint256[](yesCoinP[_market_id].length);
         uint256[] memory time1 = new uint256[](yesCoinP[_market_id].length);
-        uint256[] memory price2 = new uint256[](yesCoinP[_market_id].length);
+        uint256[] memory price2 = new uint256[](noCoinP[_market_id].length);
         uint256[] memory time2 = new uint256[](noCoinP[_market_id].length);
         for (uint i = _i; i< yesCoinP[_market_id].length ; i++){
             price1[i] = yesCoinP[_market_id][i].price;
             time1[i] = yesCoinP[_market_id][i].timestamp;
         }
         for(uint i = _i; i< noCoinP[_market_id].length ; i++){
-            price2[i] = yesCoinP[_market_id][i].price;
-            time2[i] = yesCoinP[_market_id][i].timestamp;
+            price2[i] = noCoinP[_market_id][i].price;
+            time2[i] = noCoinP[_market_id][i].timestamp;
         }
         return (price1, time1, price2, time2);
     } 
     
     //요청수락이 들어오면 분배. 단, 요청한 가격의 유효한 거래가 앞에 있는 것부터 나감.
-    function distribute(uint8 _market_id, uint8 _tokenKind, uint256 _acceptedPrice) external marketCheck(_market_id) returns (bool){
-        address requester;
+    function distribute(uint8 _market_id, uint8 _tokenKind, uint256 _acceptedPrice) external marketCheck(_market_id) expireCheck(_market_id, _tokenKind) returns (bool){
+        address requester = address(0);
         uint index;
         uint8 searchKind;
         if (_tokenKind == 1) {
@@ -170,12 +162,15 @@ contract TokenTrade is ERC20Distribution {
         else if (_tokenKind == 2){
             searchKind = 1;
         }
+        
         for (uint i = 0; i < requests[_market_id].length; i++){
             if (requests[_market_id][i].market_id == _market_id && requests[_market_id][i].is_valid == true && requests[_market_id][i].requestPrice == 1*10**18 -_acceptedPrice && requests[_market_id][i].tokenKind == searchKind) {
                 index = i;
                 requester = requests[_market_id][i].requester;       
             }
-            else return false;
+        }
+        if(requester == address(0)){
+            return false;
         }
         //이더리움 송금.
         require(ownerTransfer(msg.sender, _acceptedPrice)==true, "payment fail");
@@ -200,6 +195,8 @@ contract TokenTrade is ERC20Distribution {
         requests[_market_id][index].is_valid = false;
         alreadyRequest[requester][_market_id] = false;
         delete requestIdOf[requester][_market_id];
+        return true;
     }
 }
+
 

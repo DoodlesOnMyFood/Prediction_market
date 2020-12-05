@@ -18,17 +18,46 @@ import DetailsMode from "./Details"
 function App() {
   const [account, setAccount] = useState(null)
   const [question, setQuestion] = useState("")
-  const [deadLine, setDeadLine] = useState("")
+  const [date, setDate] = useState("")
+  const [hours, setHours] = useState("")
+  const [minutes, setMinutes] = useState("")
+  const [seconds, setSeconds] = useState("")
   const [reseted, toggleReset] = useState(false)
   const [exchanges, setExchanges] = useState(null)
+  const [owner, setOwner] = useState(null)
   const [newExchange, setNewExchange] = useState(false)
   const [nextId, setNextId] = useState(null)
   const [details, setDetails] = useState(null)
   const contract = useRef(null)
   const web3 = useRef(null)
+
+  const initWeb3 = () => {
+    return new Promise((resolve, reject) => {
+      if(typeof window.ethereum !== 'undefined') {
+        const web3 = new Web3(window.ethereum);
+        window.ethereum.enable()
+          .then(() => {
+            resolve(
+              new Web3(window.ethereum)
+            );
+          })
+          .catch(e => {
+            reject(e);
+          });
+        return;
+      }
+      if(typeof window.web3 !== 'undefined') {
+        return resolve(
+          new Web3(window.web3.currentProvider)
+        );
+      }
+      resolve(new Web3('http://localhost:9545'));
+    });
+  };
+  
   
   const loadBlockChain = async () =>{
-    web3.current = new Web3('http://localhost:9545') //connecting to ganache
+    web3.current = await initWeb3()
     const network = await web3.current.eth.net.getNetworkType();
     console.log(network) //check network type
     const accounts = await web3.current.eth.getAccounts()
@@ -44,34 +73,39 @@ function App() {
     )
   }
 
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
   const openDetails = (obj) => {
     setDetails(obj)
   }
 // loads web3
-  useEffect(() => {  
-    loadBlockChain()
-    loadContractInterface()
-    console.log(contract.current)
-    contract.current.methods.marketData().call()
-      .then( result => {
-        console.log(result)
-        setNextId(result[0].length)
-        let i = 0
-        let temp = []
-        for(i; i < nextId; i++){
-          temp.push({question : result[1][i], id : result[0][i], deadLine : result[2][i]})
-        }
-        setExchanges(temp.map(({question, id, deadLine}) => {return (
-          <Container fluid style={{marginTop : "5px"}}>
-            <SingleExchange question={question} id={id} deadLine={deadLine} contract={contract.current} account={account} openDetails={openDetails}/>
-          </Container>
-          )
-        }))
-      })
+  useEffect(() => { 
+    (async () => { 
+      await loadBlockChain()
+      loadContractInterface()
+      console.log(contract.current)
+      contract.current.methods.marketData().call({gas : 6000000})
+        .then( result => {
+          console.log(result)
+          setNextId(result[0].length)
+          let i = 0
+          let temp = []
+          for(i; i < nextId; i++){
+            temp.push({question : result[1][i], id : result[0][i], deadLine : result[2][i]})
+          }
+          setExchanges(temp.map(({question, id, deadLine}) => {
+            const done = new Date(parseInt(deadLine) * 1000).getTime() < Date.now() ? true : false
+            return (
+              <Container fluid>
+                <SingleExchange question={question} id={id} deadLine={deadLine} contract={contract.current} account={account} openDetails={openDetails} web3={web3.current} done={done}/>
+              </Container>
+            )
+          }))
+        })
+      contract.current.methods.owner().call()
+        .then( result => {
+          setOwner(result)
+        })
+    })()
+      //eslint-disable-next-line
   }, [reseted])
 
   const frontPage = () => {
@@ -82,9 +116,9 @@ function App() {
             <p style={{ position : 'absolute', zIndex : 1, top : "50%", fontSize : "0.8rem", fontFamily : 'Goldman-Bold'}}>
               total count : {nextId}
             </p>
-            <img src={filter} style={{height:"70%", position : 'absolute', right : "0px", top:'20%'}}/>
-            <img src={reset} style={{height:"70%", position : 'absolute', right : "80px", top:'20%'}} onClick={() => {toggleReset((prev) => !prev)}}/>
-            <img src={plus} style={{height:"70%", position : 'absolute', right : "40px", top:'20%'}} onClick={() => {setNewExchange(true)}}/>
+            <img src={filter} alt="" style={{height:"70%", position : 'absolute', right : "0px", top:'20%'}}/>
+            <img src={reset} alt="" style={{height:"70%", position : 'absolute', right : "40px", top:'20%'}} onClick={() => {toggleReset((prev) => !prev)}}/>
+            {account === owner? <img src={plus} alt="" style={{height:"70%", position : 'absolute', right : "80px", top:'20%'}} onClick={() => {setNewExchange(true)}}/> : ''}
           </div>
           {exchanges ? exchanges : ""}
         </Container> 
@@ -97,11 +131,17 @@ function App() {
             <form>
               <label>
                 Question : 
-                <input style={{margin : '5px'}} type="text" value={question} onChange={(e)=>{setQuestion(e.target.value)}}/>
+                <input style={{margin : '5px', width : "250px"}} type="text" value={question} onChange={(e)=>{setQuestion(e.target.value)}} placeholder="Enter topic, ideally a question. "/>
               </label>
               <label>
                 Dead-Line : 
-                <input style={{margin : '5px'}}type="text" value={deadLine} onChange={(e)=>{setDeadLine(e.target.value)}}/>
+                <input style={{margin : '5px', width : '40%'}}type="text" value={date} onChange={(e)=>{setDate(e.target.value)}} placeholder="YYYY-MM-DD"/>
+              </label>
+              <label>
+                Time :
+                <input style={{margin : '2px', width : '8%'}}type="text" value={hours} onChange={(e)=>{setHours(e.target.value)}} placeholder="HH"/>:
+                <input style={{margin : '2px', width : '8%'}}type="text" value={minutes} onChange={(e)=>{setMinutes(e.target.value)}} placeholder="MM"/>:
+                <input style={{margin : '2px', width : '8%'}}type="text" value={seconds} onChange={(e)=>{setSeconds(e.target.value)}} placeholder="SS"/>
               </label>
             </form>
           </Modal.Body>
@@ -110,7 +150,8 @@ function App() {
               Close
             </Button>
             <Button variant="primary" onClick={()=>{
-              SendNewExchange(contract.current, account, question, deadLine, nextId)
+              console.log(contract.current, account, question, date, `${hours}:${minutes}:${seconds}`, nextId)
+              SendNewExchange(contract.current, account, question, date, `${hours}:${minutes}:${seconds}`, nextId)
                 .then(() => {
                     setNextId((prev)=>prev+1)
                     setNewExchange(false)
@@ -138,7 +179,7 @@ function App() {
         </Col>
       </Row>
     </Container>
-    {details ? <DetailsMode question={details.question} id={details.id} deadLine={details.deadLine} contract={contract.current} account={account} /> : frontPage()}
+    {details ? <DetailsMode revert={setDetails} question={details.question} id={details.id} deadLine={details.deadLine} contract={contract.current} account={account} web3={web3.current} /> : frontPage()}
     </div>
   );
 }

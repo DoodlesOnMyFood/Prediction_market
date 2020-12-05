@@ -199,7 +199,7 @@
         ],
         "contractDependencies": [
           644,
-          2177
+          2015
         ],
         "contractKind": "contract",
         "documentation": {
@@ -213,7 +213,7 @@
         "linearizedBaseContracts": [
           816,
           644,
-          2177
+          2015
         ],
         "name": "ERC20Capped1",
         "nodeType": "ContractDefinition",
@@ -225,10 +225,10 @@
               "id": 737,
               "name": "SafeMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 2373,
+              "referencedDeclaration": 2211,
               "src": "213:8:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeMath_$2373",
+                "typeIdentifier": "t_contract$_SafeMath_$2211",
                 "typeString": "library SafeMath"
               }
             },
@@ -799,7 +799,7 @@
                               "lValueRequested": false,
                               "memberName": "add",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 2206,
+                              "referencedDeclaration": 2044,
                               "src": "1003:30:4",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -1028,7 +1028,7 @@
                                   "lValueRequested": false,
                                   "memberName": "add",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 2206,
+                                  "referencedDeclaration": 2044,
                                   "src": "1144:30:4",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -1320,7 +1320,7 @@
         ],
         "contractDependencies": [
           644,
-          2177
+          2015
         ],
         "contractKind": "contract",
         "documentation": {
@@ -1334,7 +1334,7 @@
         "linearizedBaseContracts": [
           816,
           644,
-          2177
+          2015
         ],
         "name": "ERC20Capped1",
         "nodeType": "ContractDefinition",
@@ -1346,10 +1346,10 @@
               "id": 737,
               "name": "SafeMath",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 2373,
+              "referencedDeclaration": 2211,
               "src": "213:8:4",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_SafeMath_$2373",
+                "typeIdentifier": "t_contract$_SafeMath_$2211",
                 "typeString": "library SafeMath"
               }
             },
@@ -1920,7 +1920,7 @@
                               "lValueRequested": false,
                               "memberName": "add",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 2206,
+                              "referencedDeclaration": 2044,
                               "src": "1003:30:4",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -2149,7 +2149,7 @@
                                   "lValueRequested": false,
                                   "memberName": "add",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 2206,
+                                  "referencedDeclaration": 2044,
                                   "src": "1144:30:4",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_function_internal_pure$_t_uint256_$_t_uint256_$returns$_t_uint256_$bound_to$_t_uint256_$",
@@ -2390,7 +2390,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.1",
-  "updatedAt": "2020-11-27T15:06:43.986Z",
+  "updatedAt": "2020-12-05T12:34:18.734Z",
   "devdoc": {
     "details": "Extension of {ERC20} that adds a cap to the supply of tokens.",
     "kind": "dev",

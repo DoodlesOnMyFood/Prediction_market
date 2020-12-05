@@ -12,7 +12,7 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         address requester;
         bool is_valid;
     }
-
+    event RequestEmit(uint256 id, bool comp, string log);
     mapping (uint8 => Request[]) internal requests;
 
     
@@ -24,18 +24,29 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
         require(is_over_distribute[_market_id] == false, "Market Distribution is over");
         _;
     }
+    modifier expireCheck(uint8 _market_id, uint8 _tokenKind){
+       if (_tokenKind == 1){
+           require(_expirationDateOf[_market_id] >= block.timestamp, "expiration date is over");
+       }
+       if (_tokenKind == 2){
+           require(_expirationDateOf1[_market_id] >= block.timestamp, "expiration date is over");
+       }
+       _;
+    }
 
     //요구하기 // 한시장당 1번.
-    function request(uint8 _market_id, uint8 _tokenKind, uint256 _price) external marketCheck(_market_id) returns (bool){
+    function request(uint8 _market_id, uint8 _tokenKind, uint256 _price) external marketCheck(_market_id) expireCheck(_market_id, _tokenKind) returns (bool){
         uint256 id;
         if (alreadyRequest[msg.sender][_market_id] == false){
+            emit RequestEmit(id, alreadyRequest[msg.sender][_market_id] == false,"in if");
             requests[_market_id].push(Request(_market_id, _tokenKind, _price, msg.sender, true));
             id = requests[_market_id].length - 1;
             requestIdOf[msg.sender][_market_id] = id;
-            alreadyRequest[msg.sender][_market_id] == true;
+            alreadyRequest[msg.sender][_market_id] = true;
             return true;
         }
         else {   
+            emit RequestEmit(id, alreadyRequest[msg.sender][_market_id] == false, "in else");
             id = requestIdOf[msg.sender][_market_id];
             requests[_market_id][id].is_valid = false;
             requests[_market_id][id].market_id = _market_id;
@@ -46,6 +57,7 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
             return true;
         }
     }
+
 
     //요청 보여주기. 
     function showRequest(uint8 _market_id, uint8 _tokenKind) external view marketCheck(_market_id) returns (uint256[] memory) {
@@ -72,4 +84,5 @@ contract ERC20Distribution is YesCoin, NoCoin, WithdrawalContract{
 
     
 }
+
 

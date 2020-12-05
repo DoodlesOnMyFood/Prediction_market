@@ -14,16 +14,13 @@ contract Exchange is TokenTrade {
         return _winnerTokenOf[_market_id];
     }
     //exchange token for eth.
-    function exchange(uint8 _market_id, uint8 _tokenKind) external expirationCheck(_market_id) returns (bool){
+    function exchange(uint8 _market_id) external expirationCheck(_market_id) returns (bool){
         uint256 tokenCount;
-        uint256 burnCount;
-        if (_tokenKind == winnerTokenOf(_market_id)){
+        if (1 == winnerTokenOf(_market_id)){
             tokenCount = balanceOf(msg.sender, _market_id);
-            burnCount = balanceOf1(msg.sender, _market_id);    
         }
-        else if (_tokenKind != winnerTokenOf(_market_id)){
+        else if (2 == winnerTokenOf(_market_id)){
             tokenCount = balanceOf1(msg.sender, _market_id);
-            burnCount = balanceOf(msg.sender, _market_id);
         }
         require(rewardTransfer(msg.sender, tokenCount*REWARD)==true);
         _burn(msg.sender, _market_id, balanceOf(msg.sender, _market_id));
@@ -31,3 +28,4 @@ contract Exchange is TokenTrade {
     }
 
 }
+

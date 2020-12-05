@@ -62,7 +62,8 @@ contract WithdrawalContract is Ownable{
 
     //자기 잔고 확인
     function getPW() public view returns (uint) {
-        return pendingWithdrawls[msg.sender];
+        uint amount = pendingWithdrawls[msg.sender];
+        return amount;
     }
 
     //owner 잔고 확인
