@@ -37,7 +37,9 @@ module.exports = {
 
   networks: {
       develop:{
-          gas:9999999999999
+          gas:9999999999999,
+          network_id : 999,
+          chainId : 999
       },
       ropsten : {
           provider : () => new HDWalletProvider('pool weekend always federal cotton mom town emerge area horn shop announce', 'https://ropsten.infura.io/v3/bdb10d6b5f274145bbae682fe9eb7a0f'),

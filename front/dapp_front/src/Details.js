@@ -286,8 +286,8 @@ const Details = ({question, id, deadLine, account, contract, web3, revert} ) => 
             <>
                 <Container style={{ height:"600px", width:'490px', marginLeft : '9px', marginBottom:'0px', marginTop:'20px', padding : 0, borderRight : "1px solid #000000", borderLeft : "1px solid #000000", borderBottom : "1px solid #000000"}} >
                     <div style={{ position : 'relative', width : '100%', height:'60px', backgroundColor : '#ffffff', marginTop : '0px', marginLeft : '0px', marginRight : '0px', marginBottom:'20px', borderTop : '1px solid #000000', borderBottom : '1px solid #000000'}}>
-                        <p style={{paddingTop : "7px", paddingLeft : "60px", fontSize : "2rem"}}>
-                            {viewType} - {viewCoin} Coins
+                        <p style={{paddingTop : "7px", paddingLeft : "40px", fontSize : "1.5rem"}}>
+                            Showing : {viewType} - {viewCoin} Coins
                         </p>
                         <img src={plus} alt="" style={{position : 'absolute', top: '10%', height:"70%", left : '80%'}} onClick={() => {newModalOn(true)}}/>
                         <img src={settings} alt="" style={{position : 'absolute', top: '10%', height:"70%", left : '90%'}} onClick={() => {settingModalOn(true)}}/>

@@ -1532,7 +1532,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.1",
-  "updatedAt": "2020-12-05T12:34:18.831Z",
+  "updatedAt": "2020-12-07T00:43:27.633Z",
   "devdoc": {
     "details": "The Ownable contract has an owner address, and provides basic authorization control functions, this simplifies the implementation of \"user permissions\".",
     "kind": "dev",

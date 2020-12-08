@@ -24,7 +24,7 @@ function App() {
   const [seconds, setSeconds] = useState("")
   const [reseted, toggleReset] = useState(false)
   const [exchanges, setExchanges] = useState(null)
-  const [owner, setOwner] = useState(null)
+  const [owner, setOwner] = useState(true)
   const [newExchange, setNewExchange] = useState(false)
   const [nextId, setNextId] = useState(null)
   const [details, setDetails] = useState(null)
@@ -33,8 +33,7 @@ function App() {
 
   const initWeb3 = () => {
     return new Promise((resolve, reject) => {
-      if(typeof window.ethereum !== 'undefined') {
-        const web3 = new Web3(window.ethereum);
+      if(typeof window.ethereum !== 'undefined') { // For newer Metamask clients
         window.ethereum.enable()
           .then(() => {
             resolve(
@@ -46,12 +45,12 @@ function App() {
           });
         return;
       }
-      if(typeof window.web3 !== 'undefined') {
+      if(typeof window.web3 !== 'undefined') { // For older Metamask clients
         return resolve(
           new Web3(window.web3.currentProvider)
         );
       }
-      resolve(new Web3('http://localhost:9545'));
+      resolve(new Web3('http://localhost:9545')); // Connecting to Truffle suite
     });
   };
   
@@ -82,7 +81,7 @@ function App() {
       await loadBlockChain()
       loadContractInterface()
       console.log(contract.current)
-      contract.current.methods.marketData().call({gas : 6000000})
+      contract.current.methods.marketData().call()
         .then( result => {
           console.log(result)
           setNextId(result[0].length)
